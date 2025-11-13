@@ -1,0 +1,633 @@
+{
+  "name": "AI Powered Video Analysis Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/upload/v1beta/files",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Goog-Upload-Command",
+              "value": "start, upload, finalize"
+            },
+            {
+              "name": "X-Goog-Upload-Header-Content-Length",
+              "value": "={{ $binary.Video.fileSize }}"
+            },
+            {
+              "name": "X-Goog-Upload-Header-Content-Type",
+              "value": "={{ $binary.Video.fileType }}/{{ $binary.Video.fileExtension }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "={{ $binary.Video.fileType }}/{{ $binary.Video.fileExtension }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "Video",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        512
+      ],
+      "id": "89999569-7362-4fb1-9fe4-923bae8fd648",
+      "name": "Upload_File",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "YJYQ8VMOvDLDNFq8",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"fileData\": {\n            \"fileUri\": \"{{ $json.file.uri }}\",\n            \"mimeType\": \"{{ $json.file.mimeType }}\"\n          }\n        },\n        {\n          \"text\": \"Describe what's going on in the video in great detail.\"\n        }\n      ]\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        736,
+        512
+      ],
+      "id": "dffd5c71-0430-4ced-adb9-2ddad40f7750",
+      "name": "Get_Analysis",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "YJYQ8VMOvDLDNFq8",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Insert Video",
+        "formDescription": "Drop in a video for analysis.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Video",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        512
+      ],
+      "id": "e30892ce-8a65-4340-962d-3c044dbff841",
+      "name": "On form submission 2",
+      "webhookId": "19cf8ff9-5459-4553-a36a-ad32831ff455",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"fileData\": {\n            \"fileUri\": \"{{ $json.file.uri }}\",\n            \"mimeType\": \"{{ $json.file.mimeType }}\"\n          }\n        },\n        {\n          \"text\": \"Describe what's going on in the video in great detail. Describe the entire video.\"\n        }\n      ]\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1008,
+        -48
+      ],
+      "id": "27cb4caa-1564-4629-936d-dd2aef2e9f4b",
+      "name": "Get Analysis",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "YJYQ8VMOvDLDNFq8",
+          "name": "Query Auth account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/upload/v1beta/files",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Goog-Upload-Command",
+              "value": "start, upload, finalize"
+            },
+            {
+              "name": "X-Goog-Upload-Header-Content-Length",
+              "value": "={{ $binary.Video.fileSize }}"
+            },
+            {
+              "name": "X-Goog-Upload-Header-Content-Type",
+              "value": "={{ $binary.Video.fileType }}/{{ $binary.Video.fileExtension }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "={{ $binary.Video.fileType }}/{{ $binary.Video.fileExtension }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "Video",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        -48
+      ],
+      "id": "10476d37-0d7d-4ba7-a75b-7bec5cdaf20f",
+      "name": "Upload File ",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "YJYQ8VMOvDLDNFq8",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1248,
+        -48
+      ],
+      "id": "6ec364a3-a0fa-4bd3-bb2f-976abd9ac1db",
+      "name": "5 seconds",
+      "webhookId": "2ae152a3-3b31-497a-b285-8a19a7933c07"
+    },
+    {
+      "parameters": {
+        "formTitle": "Insert Video",
+        "formDescription": "Drop in a video for analysis.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Video",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        -48
+      ],
+      "id": "597bc0ca-3f04-47eb-866d-0c9be8ae7ab2",
+      "name": "On form submission",
+      "webhookId": "d5b07e65-1bc8-4d57-9c91-e3f7531dbd08"
+    },
+    {
+      "parameters": {
+        "content": "## Form Trigger\n",
+        "height": 220,
+        "width": 220,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -112
+      ],
+      "id": "4311a602-fb6f-4c89-8ffa-9825128a47cf",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Upload File\n\n",
+        "height": 220,
+        "width": 220,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -112
+      ],
+      "id": "81b05472-fba8-42e8-83d9-757e5ccd1c9f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Get Analysis\n\n",
+        "height": 220,
+        "width": 220,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        -112
+      ],
+      "id": "1edf7996-3f35-40d1-bed9-cf95670a19ca",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        -48
+      ],
+      "id": "bf56ba81-db6f-4709-830d-373255f03d5d",
+      "name": "Wait",
+      "webhookId": "bf2e644e-b6de-463f-938b-71c42da94efe"
+    },
+    {
+      "parameters": {
+        "content": "## Wait\n\n",
+        "height": 220,
+        "width": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -112
+      ],
+      "id": "69616e0a-b71b-4503-9929-ecb9d378200c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Polling\n\n",
+        "height": 220,
+        "width": 220,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        -112
+      ],
+      "id": "a716e794-1afd-4317-a20e-f2b90ebd2ee3",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "268682ab-62a0-4e6f-aea0-652b30325f70",
+              "name": "Video Analysis",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1472,
+        -48
+      ],
+      "id": "2f91bef7-e0a0-4b55-8fe8-c77e02f5b30f",
+      "name": "Video Analysis"
+    },
+    {
+      "parameters": {
+        "content": "## Result\n\n\n",
+        "height": 220,
+        "width": 220,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        -112
+      ],
+      "id": "3d7f97a5-c897-493e-a47b-2c4d5d8caeb6",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# Why We Have to Poll",
+        "height": 280,
+        "width": 900,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        416
+      ],
+      "id": "ad4a4351-e130-459f-b7c8-69fe3fe451b4",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6aa35452-e87b-432b-8f29-56df7dbd8492",
+              "name": "text",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        928,
+        512
+      ],
+      "id": "285fc881-7217-4b64-83c5-a3ce94ca3f8e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        336,
+        208
+      ],
+      "id": "375af9e6-b33f-4736-9c1d-6f3745735fe8",
+      "name": "When clicking ‘Test workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Please summarize the video in 3 sentences.\"\n        },\n        {\n          \"file_data\": {\n            \"file_uri\": \"https://www.youtube.com/shorts/NQhsLVmuItA\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        208
+      ],
+      "id": "0541d9df-8d55-4cda-9c95-6fe0283548da",
+      "name": "YouTube Video",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "gGhukzB9fDKWjSis",
+          "name": "Query Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2103b25e-fbee-4d71-9224-280f1c2383da",
+              "name": "text",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        208
+      ],
+      "id": "19dc83b3-d9e2-4ffe-a0f6-04f80a3e1fc5",
+      "name": "Get Results"
+    },
+    {
+      "parameters": {
+        "content": "# YouTube Vision\n",
+        "height": 260,
+        "width": 800,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        128
+      ],
+      "id": "10145e54-2da4-4228-b516-71d32428fa06",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "🛠️ Setup Instructions\n\n✅ Step 1: Get Your API Key\n\nVisit Google AI Studio\n and create your free Gemini API key.\n\nNext, add it in n8n by creating a new HTTP Query Auth credential.\nUse this key in every HTTP Request node that connects to Gemini services.\n\n🎬 Step 2: Add Your Video\n\nYou’re ready to start! You can either:\n\nUpload a video directly through the Form Trigger, or\n\nPaste a YouTube video link to analyze automatically.\n\nThat’s it — your AI-powered video analysis workflow is now ready to run.",
+        "height": 400,
+        "width": 528
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        -112
+      ],
+      "id": "bc656247-3fd9-4bf4-bee7-69ad765d0a0d",
+      "name": "Sticky Note8"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Upload_File": {
+      "main": [
+        [
+          {
+            "node": "Get_Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission 2": {
+      "main": [
+        [
+          {
+            "node": "Upload_File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload File ": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Analysis": {
+      "main": [
+        [
+          {
+            "node": "Video Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "5 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5 seconds": {
+      "main": [
+        [
+          {
+            "node": "Get Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Upload File ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get_Analysis": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "YouTube Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube Video": {
+      "main": [
+        [
+          {
+            "node": "Get Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4b985d14-07ac-4ef3-abb8-30523d014090",
+  "meta": {
+    "instanceId": "d153c985e451213c73831487c0774d0c0de0a3e99382aff0c69e404bcb85ba10"
+  },
+  "id": "mPtSuK6J1Jyg4VYZ",
+  "tags": []
+}
